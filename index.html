@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Regresiva para Nuestro Aniversario</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Generales */
+        :root {
+            --retro-paper: #f5f1e6;
+            --retro-accent: #f0e6d2;
+            --retro-ink: #212121;
+            --border-color: #000;
+            --shadow-color: rgba(0, 0, 0, 0.8);
+            --accent-color: #e53e3e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--retro-paper);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a19483' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--retro-ink);
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Patrones de Zigzag */
+        .zigzag-top, .zigzag-bottom {
+            height: 24px;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='10' viewBox='0 0 60 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L5 5L10 0L15 5L20 0L25 5L30 0L35 5L40 0L45 5L50 0L55 5L60 0V10H0V0Z' fill='black'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            z-index: 10;
+        }
+
+        .zigzag-top {
+            top: 0;
+            transform: rotate(180deg);
+        }
+
+        .zigzag-bottom {
+            bottom: 0;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 800px;
+            text-align: center;
+            background-color: white;
+            border: 4px solid var(--border-color);
+            padding: 2rem;
+            box-shadow: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Encabezado */
+        .header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        /* Imagen */
+        .image-container {
+            margin: 2rem auto;
+            border: 3px solid var(--border-color);
+            padding: 0.5rem;
+            max-width: 400px;
+            position: relative;
+            background-color: var(--retro-paper);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-container::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: -10px;
+            bottom: -10px;
+            border: 1px solid var(--border-color);
+            z-index: -1;
+        }
+
+        /* Temporizador */
+        .timer-container {
+            margin: 2rem 0;
+        }
+
+        .timer-label {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .timer-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer-value {
+            font-size: 3rem;
+            font-weight: bold;
+            background-color: var(--retro-accent);
+            border: 3px solid var(--border-color);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        .timer-unit {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        /* Mensaje */
+        .message {
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Botón */
+        .button-container {
+            margin: 2rem 0;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .access-button {
+            display: none;
+            padding: 1rem 2rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: 3px solid var(--border-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+
+        .access-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        .access-button:active {
+            transform: translateY(2px);
+            box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Decoraciones */
+        .heart-decoration {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e53e3e' stroke='%23e53e3e' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.8;
+        }
+
+        .heart-1 {
+            top: 20px;
+            left: 20px;
+            transform: rotate(-15deg);
+        }
+
+        .heart-2 {
+            top: 20px;
+            right: 20px;
+            transform: rotate(15deg);
+        }
+
+        .heart-3 {
+            bottom: 20px;
+            left: 20px;
+            transform: rotate(15deg);
+        }
+
+        .heart-4 {
+            bottom: 20px;
+            right: 20px;
+            transform: rotate(-15deg);
+        }
+
+        /* Confeti (aparecerá cuando el temporizador llegue a cero) */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .timer {
+                gap: 0.5rem;
+            }
+            
+            .timer-value {
+                font-size: 2.5rem;
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .timer {
+                gap: 0.25rem;
+            }
+            
+            .timer-value {
+                font-size: 1.8rem;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Patrones de Zigzag -->
+    <div class="zigzag-top"></div>
+    <div class="zigzag-bottom"></div>
+
+    <!-- Contenedor Principal -->
+    <div class="container">
+        <!-- Decoraciones de Corazones -->
+        <div class="heart-decoration heart-1"></div>
+        <div class="heart-decoration heart-2"></div>
+        <div class="heart-decoration heart-3"></div>
+        <div class="heart-decoration heart-4"></div>
+
+        <!-- Encabezado -->
+        <header class="header">
+            <h1 class="title">NUESTRO ANIVERSARIO</h1>
+            <p class="subtitle">Algo especial está por venir...</p>
+        </header>
+
+        <!-- Imagen -->
+        <div class="image-container">
+            <img src="beso.jpeg" alt="Nosotros juntos" id="coupleImage">
+        </div>
+
+        <!-- Temporizador -->
+        <div class="timer-container">
+            <p class="timer-label">Tiempo restante para ver tu sorpresa:</p>
+            <div class="timer">
+                <div class="timer-segment">
+                    <div class="timer-value" id="days">00</div>
+                    <div class="timer-unit">días</div>
+                </div>
+                <div class="timer-segment">
+                    <div class="timer-value" id="hours">00</div>
+                    <div class="timer-unit">horas</div>
+                </div>
+                <div class="timer-segment">
+                    <div class="timer-value" id="minutes">00</div>
+                    <div class="timer-unit">minutos</div>
+                </div>
+                <div class="timer-segment">
+                    <div class="timer-value" id="seconds">00</div>
+                    <div class="timer-unit">segundos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="message">
+            <p>Estoy preparando algo muy especial para celebrar nuestro primer año juntos. 
+               Tendrás que esperar un poco para verlo... ¡La espera valdrá la pena!</p>
+            <p style="margin-top: 1rem;">Mientras tanto, recuerda cuánto te amo y lo feliz que soy a tu lado. ❤️</p>
+        </div>
+
+        <!-- Botón (aparecerá cuando el temporizador llegue a cero) -->
+        <div class="button-container">
+            <button id="accessButton" class="access-button">VER NUESTRA PÁGINA DE ANIVERSARIO</button>
+        </div>
+    </div>
+
+    <!-- Contenedor de Confeti -->
+    <div id="confettiContainer" class="confetti-container"></div>
+
+    <script>
+        // Configurar la fecha objetivo (puedes ajustarla según tus necesidades)
+        // Para probar, establece una fecha que sea unos segundos en el futuro
+        // Para uso real, establece la fecha de su aniversario
+        
+        // OPCIÓN 1: Para pruebas - 30 segundos desde ahora
+        // const targetDate = new Date();
+        // targetDate.setSeconds(targetDate.getSeconds() + 30);
+        
+        // OPCIÓN 2: Para uso real - Fecha específica (descomenta y ajusta)
+        const targetDate = new Date('2025-04-01T22:20:00');
+        
+        // Elementos del DOM
+        const daysElement = document.getElementById('days');
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        const accessButton = document.getElementById('accessButton');
+        const confettiContainer = document.getElementById('confettiContainer');
+        
+        // Función para actualizar el temporizador
+        function updateTimer() {
+            const now = new Date();
+            const difference = targetDate - now;
+            
+            if (difference <= 0) {
+                // El tiempo ha terminado
+                daysElement.textContent = '00';
+                hoursElement.textContent = '00';
+                minutesElement.textContent = '00';
+                secondsElement.textContent = '00';
+                
+                // Mostrar el botón
+                accessButton.style.display = 'inline-block';
+                
+                // Mostrar confeti
+                showConfetti();
+                
+                // Detener el intervalo
+                clearInterval(timerInterval);
+            } else {
+                // Calcular días, horas, minutos y segundos
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                // Actualizar el DOM
+                daysElement.textContent = days < 10 ? `0${days}` : days;
+                hoursElement.textContent = hours < 10 ? `0${hours}` : hours;
+                minutesElement.textContent = minutes < 10 ? `0${minutes}` : minutes;
+                secondsElement.textContent = seconds < 10 ? `0${seconds}` : seconds;
+            }
+        }
+        
+        // Iniciar el temporizador
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+        
+        // Función para mostrar confeti cuando el temporizador llegue a cero
+        function showConfetti() {
+            confettiContainer.style.display = 'block';
+            
+            // Crear 100 piezas de confeti
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+            }
+        }
+        
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Posición aleatoria
+            const startX = Math.random() * window.innerWidth;
+            
+            // Color aleatorio
+            const colors = ['#e53e3e', '#dd6b20', '#d69e2e', '#38a169', '#3182ce', '#805ad5', '#d53f8c'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Tamaño aleatorio
+            const size = Math.random() * 10 + 5;
+            
+            // Forma aleatoria
+            const shapes = ['circle', 'square', 'triangle'];
+            const shape = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            // Aplicar estilos
+            confetti.style.left = `${startX}px`;
+            confetti.style.top = '-20px';
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+            confetti.style.backgroundColor = color;
+            confetti.style.opacity = '1';
+            
+            if (shape === 'circle') {
+                confetti.style.borderRadius = '50%';
+            } else if (shape === 'triangle') {
+                confetti.style.width = '0';
+                confetti.style.height = '0';
+                confetti.style.backgroundColor = 'transparent';
+                confetti.style.borderLeft = `${size/2}px solid transparent`;
+                confetti.style.borderRight = `${size/2}px solid transparent`;
+                confetti.style.borderBottom = `${size}px solid ${color}`;
+            }
+            
+            // Añadir al contenedor
+            confettiContainer.appendChild(confetti);
+            
+            // Animación
+            const duration = Math.random() * 3 + 2;
+            const rotation = Math.random() * 360;
+            const xMovement = (Math.random() - 0.5) * 200;
+            
+            confetti.style.animation = `fall ${duration}s linear forwards`;
+            confetti.style.transform = `rotate(${rotation}deg)`;
+            
+            // Crear keyframes para la animación de caída
+            const keyframes = `
+                @keyframes fall {
+                    0% {
+                        transform: translateY(0) translateX(0) rotate(${rotation}deg);
+                        opacity: 1;
+                    }
+                    70% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(${window.innerHeight}px) translateX(${xMovement}px) rotate(${rotation + 360}deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            
+            // Añadir keyframes al documento
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = keyframes;
+            document.head.appendChild(styleSheet);
+            
+            // Eliminar el confeti después de la animación
+            setTimeout(() => {
+                confetti.remove();
+                styleSheet.remove();
+            }, duration * 1000);
+        }
+        
+        // Configurar el botón para redirigir a la página real
+        accessButton.addEventListener('click', function() {
+            // Reemplaza la siguiente línea con la URL de tu página real
+            alert('¡Ahora te llevaré a la página real de aniversario! ❤️');
+            window.location.href = 'https://yxff26.github.io/1-4-25/';
+        });
+    </script>
+</body>
+</html>
